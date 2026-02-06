@@ -25,6 +25,8 @@ To use the generator, your Linux environment must have the following dependencie
 
     OpenSSL: For creating the "ms-unified" SSL certificates for HTTPS communication.
 
+    Pycryptodome: Required by encryptor.py for AES/XOR operations (install via pip).
+
 Quick Start Guide
 1. Preparation
 
