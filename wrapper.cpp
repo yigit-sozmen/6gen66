@@ -4,7 +4,6 @@
 
 #pragma comment(lib, "wininet.lib")
 
-
 unsigned char junkData[100 * 1024 * 1024] = { 0x4D, 0x5A, 0x90, 0x00 };
 
 bool IsNetworkReady() {
