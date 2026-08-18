@@ -58,6 +58,7 @@ To use with Metasploit:
 ## Roadmap
 
 6gen66 is still in early stages of development. Future improvements will be:
+ - Global Makefile
  - File size pumping for more stealth
  - Code signing improvements
  - Encryption for XOR obfuscation.
