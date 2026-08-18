@@ -22,7 +22,7 @@
 
 To simply install and run 6gen66 :
 ```
-git clone https://yigit-sozmen/6gen66.git
+git clone https://github.com/yigit-sozmen/6gen66.git
 cd 6gen66
 python3 6gen66.py
 ```
