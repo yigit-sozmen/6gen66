@@ -64,13 +64,6 @@ def get_user_target(lhost):
 
     return int(host_port), payload_name
 
-
-def user_info():
-    # To send info to backdoor.py
-    ip = get_user_ip()
-    port, payload = get_user_target(ip)
-    return ip, port, payload
-
 def metasploit_handler(lhost,lport):
     print("Creating a handler file for Metasploit...")
 
